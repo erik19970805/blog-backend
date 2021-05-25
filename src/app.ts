@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { port } from './config/config';
 
 // Import Routers
+import authRouter from './routes/auth.routes';
 
 // Initializations
 const app: Application = express();
@@ -20,5 +21,6 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 
 // Routers
+app.use('/api/auth', authRouter);
 
 export default app;
