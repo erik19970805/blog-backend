@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import e, { Request, Response, NextFunction } from 'express';
 import { IUser } from '../interfaces/user.interface';
 
 export const validateEmail = (email: string): boolean => {
@@ -18,25 +18,25 @@ export const validSignup = async (
   next: NextFunction,
 ): Promise<void | Response> => {
   const { name, account, password }: IUser = req.body;
+
+  const errors: string[] = [];
+
   if (!name) {
-    return res.status(400).json({ error: 'Porfavor agrege su nombre' });
+    errors.push('Porfavor agrege su nombre');
   }
   if (name.length > 20) {
-    return res.status(400).json({ error: 'Su nombre no puede ser mayor de 20 caracteres' });
+    errors.push('Su nombre no puede ser mayor de 20 caracteres');
   }
   if (!account) {
-    return res
-      .status(400)
-      .json({ error: 'Porfavor agrege su correo electronico o su numero de celular' });
+    errors.push('Porfavor agrege su correo electronico o su numero de celular');
   }
   if (!validPhone(account) && !validateEmail(account)) {
-    return res
-      .status(400)
-      .json({ error: 'El formato del correo electronico o del numero de celular son incorrectos' });
+    errors.push('El formato del correo electronico o del numero de celular son incorrectos');
   }
   if (password.length < 6) {
-    return res.status(400).json({ error: 'La contraseña debe tener minimo 6 caracteres' });
+    errors.push('La contraseña debe tener minimo 6 caracteres');
   }
+  if (errors.length > 0) return res.status(400).json({ error: errors });
   next();
   return undefined;
 };

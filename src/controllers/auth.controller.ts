@@ -2,8 +2,11 @@ import { Request, Response } from 'express';
 import { IUser } from '../interfaces/user.interface';
 import Users from '../models/user.model';
 import { generateActiveToken } from '../config/generateToken';
+import { validateEmail } from '../middlewares/valid';
+import sendEmail from '../config/sendEmail';
+import { urlClient } from '../config/config';
 
-export const signup = async (req: Request, res: Response): Promise<Response> => {
+export const signup = async (req: Request, res: Response): Promise<Response | undefined> => {
   try {
     const { name, account, password }: IUser = req.body;
     const user = await Users.findOne({ account });
@@ -19,14 +22,14 @@ export const signup = async (req: Request, res: Response): Promise<Response> => 
     });
 
     const activeToken = generateActiveToken({ name, account, password });
-    await newUser.save();
+    // await newUser.save();
+    const url = `${urlClient}/active/${activeToken}`;
 
-    return res.json({
-      status: 'OK',
-      message: 'Se registro correctamente',
-      user: newUser,
-      activeToken,
-    });
+    if (validateEmail(account)) {
+      sendEmail(account, url, 'Verifique su dirección de correo electrónico');
+      return res.json({ message: 'Porfavor revice su correo electrónico' });
+    }
+    return undefined;
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
