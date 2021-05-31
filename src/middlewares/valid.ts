@@ -1,4 +1,4 @@
-import e, { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { IUser } from '../interfaces/user.interface';
 
 export const validateEmail = (email: string): boolean => {
