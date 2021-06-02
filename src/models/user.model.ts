@@ -19,7 +19,6 @@ const userSchema: Schema<IUserModel> = new Schema(
     password: {
       type: String,
       required: [true, 'Porfavor agrege su contraseña'],
-      trim: true,
     },
     avatar: {
       type: String,
@@ -38,14 +37,6 @@ const userSchema: Schema<IUserModel> = new Schema(
   },
   { timestamps: true },
 );
-
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
-  const salt = await bcrypt.genSalt(10);
-  const hash = await bcrypt.hash(this.password, salt);
-  this.password = hash;
-  return next();
-});
 
 userSchema.methods.matchPassword = async function (password: string): Promise<boolean> {
   const match = await bcrypt.compare(password, this.password);

@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "lint": "eslint '*/**/*.{js,ts}' --quiet --fix",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +23,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.10",
     "morgan": "^1.10.0",
-    "nodemailer": "^6.6.1"
+    "nodemailer": "^6.6.1",
+    "twilio": "^3.63.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -40,7 +43,16 @@
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.23.2",
+    "husky": "^6.0.0",
+    "lint-staged": "^11.0.0",
+    "mrm": "^3.0.2",
+    "mrm-task-lint-staged": "^6.0.0",
+    "prettier": "^2.3.0",
     "ts-node-dev": "^1.1.6",
     "typescript": "^4.2.4"
+  },
+  "lint-staged": {
+    "*.{ts,js}": "eslint --cache --fix",
+    "*.{ts,md}": "prettier --write"
   }
 }
