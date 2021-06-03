@@ -3,12 +3,16 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import { IUser } from '../interfaces/user.interface';
 import Users from '../models/user.model';
-import { generateActiveToken } from '../config/generateToken';
+import {
+  generateAccessToken,
+  generateActiveToken,
+  generateRefreshToken,
+} from '../config/generateToken';
 import { validateEmail, validPhone } from '../middlewares/valid';
 import sendEmail from '../config/sendEmail';
 import { typeToken, urlClient } from '../config/config';
 import { sendSms } from '../config/sendSMS';
-import { ITypeToken } from '../interfaces/token.interfaces';
+import { IDecodedToken, ITypeToken } from '../interfaces/token.interfaces';
 
 export const signup = async (req: Request, res: Response): Promise<Response | undefined> => {
   try {
@@ -43,7 +47,7 @@ export const signup = async (req: Request, res: Response): Promise<Response | un
 export const activeAccount = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { activeToken }: ITypeToken = req.body;
-    const decoded = jwt.verify(activeToken, typeToken.activeToken);
+    const decoded = <IDecodedToken>jwt.verify(activeToken, typeToken.activeToken);
     if (!decoded) return res.status(400).json({ error: 'Autenticación inválida' });
     const newUser = new Users(decoded);
     await newUser.save();
@@ -65,7 +69,52 @@ export const activeAccount = async (req: Request, res: Response): Promise<Respon
 
 export const signin = async (req: Request, res: Response): Promise<Response> => {
   try {
-    return res.json({ message: 'Se registro correctamente' });
+    const { account, password }: IUser = req.body;
+    const user = await Users.findOne({ account });
+    if (!user) return res.status(400).json({ message: 'La cuenta no existe' });
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) return res.status(400).json({ error: 'Constraseña incorrecta' });
+
+    const accessToken = generateAccessToken({ id: user._id });
+    const refreshToken = generateRefreshToken({ id: user._id });
+
+    res.cookie('refreshtoken', refreshToken, {
+      httpOnly: true,
+      path: '/api/auth/refresh_token',
+      maxAge: 30 * 24 * 60 * 1000,
+    });
+    return res.json({
+      message: 'Se inició sección correctamente',
+      accessToken,
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const signout = (req: Request, res: Response): Response => {
+  try {
+    res.clearCookie('refreshtoken', { path: '/api/auth/refresh_token' });
+    return res.json({ message: 'Se ha cerrado la sesión' });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const refreshToken = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const rfToken = req.cookies.refreshtoken;
+    if (!rfToken) return res.status(400).json({ error: 'Por favor debe iniciar sesión' });
+    const decoded = <IDecodedToken>jwt.verify(rfToken, typeToken.refreshToken);
+    if (!decoded.id) return res.status(400).json({ error: 'Por favor debe iniciar sesión' });
+
+    const user = await Users.findById(decoded.id).select('-password');
+    if (!user) return res.status(400).json({ error: 'Esta cuenta no existe' });
+
+    const accessToken = generateAccessToken({ id: user._id });
+
+    return res.json({ accessToken });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }

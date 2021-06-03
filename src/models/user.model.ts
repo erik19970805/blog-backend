@@ -32,7 +32,7 @@ const userSchema: Schema<IUserModel> = new Schema(
     },
     type: {
       type: String,
-      default: 'normal',
+      default: 'register',
     },
   },
   { timestamps: true },
