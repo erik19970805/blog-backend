@@ -71,7 +71,7 @@ export const signin = async (req: Request, res: Response): Promise<Response> => 
   try {
     const { account, password }: IUser = req.body;
     const user = await Users.findOne({ account });
-    if (!user) return res.status(400).json({ message: 'La cuenta no existe' });
+    if (!user) return res.status(400).json({ error: 'La cuenta no existe' });
     const isMatch = await user.matchPassword(password);
     if (!isMatch) return res.status(400).json({ error: 'Constraseña incorrecta' });
 

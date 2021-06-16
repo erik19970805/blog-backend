@@ -2,7 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import { port } from './config/config';
+import { port, urlClient } from './config/config';
 
 // Import Routers
 import authRouter from './routes/auth.routes';
@@ -16,7 +16,7 @@ app.set('port', port);
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cors({ credentials: true, origin: urlClient }));
 app.use(morgan('dev'));
 app.use(cookieParser());
 
