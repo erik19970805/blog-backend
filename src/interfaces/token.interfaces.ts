@@ -13,6 +13,6 @@ export interface INewUser {
 export interface IDecodedToken {
   id?: string;
   newUser?: INewUser;
-  iat: number;
-  exp: number;
+  iat?: number;
+  exp?: number;
 }

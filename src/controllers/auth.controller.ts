@@ -24,10 +24,8 @@ export const signup = async (req: Request, res: Response): Promise<Response | un
         .json({ error: 'El correo electronico o el numero de celular ya existen' });
 
     const passwordHash = await bcrypt.hash(password, 12);
-    // const newUser = new Users();
-
-    const activeToken = generateActiveToken({ name, account, password: passwordHash });
-    // await newUser.save();
+    const newUser = { name, account, password: passwordHash };
+    const activeToken = generateActiveToken({ newUser });
     const url = `${urlClient}/active/${activeToken}`;
 
     if (validateEmail(account)) {
@@ -47,23 +45,18 @@ export const signup = async (req: Request, res: Response): Promise<Response | un
 export const activeAccount = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { activeToken }: ITypeToken = req.body;
-    const decoded = <IDecodedToken>jwt.verify(activeToken, typeToken.activeToken);
-    if (!decoded) return res.status(400).json({ error: 'Autenticación inválida' });
-    const newUser = new Users(decoded);
+    const { newUser: userToken } = <IDecodedToken>jwt.verify(activeToken, typeToken.activeToken);
+    if (!userToken) return res.status(400).json({ error: 'Autenticación inválida' });
+    const user = await Users.findOne({ account: userToken.account });
+    if (user)
+      return res
+        .status(400)
+        .json({ error: 'La cuenta ya fue verificada, no se puede verificar otra vez' });
+    const newUser = new Users(userToken);
     await newUser.save();
     return res.json({ message: 'Su cuenta ha sido verificada ya puede iniciar sección' });
   } catch (error) {
-    let errMsg;
-    let name;
-    if (error.code === 11000) {
-      errMsg = `${Object.keys(error.keyValue)[0]} Ya existe`;
-    } else if (error.errors) {
-      name = Object.keys(error.errors)[0] as string;
-      errMsg = error.errors[`${name}`].message;
-    } else {
-      errMsg = error.message;
-    }
-    return res.status(500).json({ error: errMsg });
+    return res.status(500).json({ error: error.message });
   }
 };
 

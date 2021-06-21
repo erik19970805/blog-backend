@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
-import { IUser, IUserModel } from '../interfaces/user.interface';
 import { typeToken } from './config';
+import { IDecodedToken } from '../interfaces/token.interfaces';
 
-export const generateActiveToken = (payload: IUser): string =>
+export const generateActiveToken = (payload: IDecodedToken): string =>
   jwt.sign(payload, `${typeToken.activeToken}`, { expiresIn: '5m' });
 
 export const generateAccessToken = (payload: { id: string }): string =>
