@@ -107,7 +107,7 @@ export const refreshToken = async (req: Request, res: Response): Promise<Respons
 
     const accessToken = generateAccessToken({ id: user._id });
 
-    return res.json({ accessToken });
+    return res.json({ accessToken, user });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
