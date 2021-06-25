@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { typeToken } from './config';
-import { IDecodedToken } from '../interfaces/token.interfaces';
+import { IDecodedToken } from '../interfaces/token.interface';
 
 export const generateActiveToken = (payload: IDecodedToken): string =>
   jwt.sign(payload, `${typeToken.activeToken}`, { expiresIn: '5m' });

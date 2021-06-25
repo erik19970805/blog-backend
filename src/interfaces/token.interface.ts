@@ -1,13 +1,9 @@
+import { INewUser } from './auth.interface';
+
 export interface ITypeToken {
   activeToken: string;
   accessToken: string;
   refreshToken: string;
-}
-
-export interface INewUser {
-  name: string;
-  account: string;
-  password: string;
 }
 
 export interface IDecodedToken {

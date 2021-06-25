@@ -12,7 +12,7 @@ export const port = env.PORT ? env.PORT : 4000;
 
 export const urlClient = env.CLIENT_URL ? env.CLIENT_URL : 'http://localhost:3000';
 
-export const mail = {
+export const google = {
   clientID: env.MAIL_CLIENT_ID ? env.MAIL_CLIENT_ID : '',
   clientSecret: env.MAIL_CLIENT_SECRET ? env.MAIL_CLIENT_SECRET : '',
   refreshToken: env.MAIL_REFRESH_TOKEN ? env.MAIL_REFRESH_TOKEN : '',
