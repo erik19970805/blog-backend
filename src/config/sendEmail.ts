@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { OAuth2Client } from 'google-auth-library';
 import SMTPTransport from 'nodemailer/lib/smtp-transport';
-import { google } from './config';
+import { apiGoogle } from './config';
 
 // send email
 const sendEmail = async (
@@ -10,27 +10,27 @@ const sendEmail = async (
   txt: string,
 ): Promise<SMTPTransport.SentMessageInfo | undefined> => {
   const oAuth2Client = new OAuth2Client(
-    google.clientID,
-    google.clientSecret,
-    google.oauthPlayground,
+    apiGoogle.clientID,
+    apiGoogle.clientSecret,
+    apiGoogle.oauthPlayground,
   );
-  oAuth2Client.setCredentials({ refresh_token: google.refreshToken });
+  oAuth2Client.setCredentials({ refresh_token: apiGoogle.refreshToken });
   try {
     const accessToken = await oAuth2Client.getAccessToken();
     const transport = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         type: 'OAuth2',
-        user: google.senderEmailAddress,
-        clientId: google.clientID,
-        clientSecret: google.clientSecret,
-        refreshToken: google.refreshToken,
+        user: apiGoogle.senderEmailAddress,
+        clientId: apiGoogle.clientID,
+        clientSecret: apiGoogle.clientSecret,
+        refreshToken: apiGoogle.refreshToken,
         accessToken: accessToken as string,
       },
     });
 
     const mailOptions = {
-      from: google.senderEmailAddress,
+      from: apiGoogle.senderEmailAddress,
       to,
       subject: 'BlogDev',
       html: `

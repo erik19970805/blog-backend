@@ -11,7 +11,7 @@ import {
 } from '../config/generateToken';
 import { validateEmail, validPhone } from '../middlewares/valid';
 import sendEmail from '../config/sendEmail';
-import { google, typeToken, urlClient } from '../config/config';
+import { api, apiFacebook, apiGoogle, typeToken, urlClient } from '../config/config';
 import { sendSms } from '../config/sendSMS';
 import { IDecodedToken, ITypeToken } from '../interfaces/token.interface';
 import { IGgPayload } from '../interfaces/auth.interface';
@@ -145,7 +145,7 @@ export const signinUser = async (
   }
 };
 
-export const signupUser = async (data: IUser, res: Response): Promise<Response | undefined> => {
+export const signupUser = async (data: IUser, res: Response): Promise<Response> => {
   try {
     const newUser = new Users(data);
     await newUser.save();
@@ -168,14 +168,11 @@ export const signupUser = async (data: IUser, res: Response): Promise<Response |
   }
 };
 
-export const googleSignin = async (
-  req: Request,
-  res: Response,
-): Promise<Response<unknown, Record<string, unknown>> | undefined> => {
+export const googleSignin = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { idToken } = req.body;
-    const client = new OAuth2Client(`${google.clientID}`);
-    const verify = await client.verifyIdToken({ idToken, audience: google.clientID });
+    const client = new OAuth2Client(`${apiGoogle.clientID}`);
+    const verify = await client.verifyIdToken({ idToken, audience: apiGoogle.clientID });
     const { email, email_verified, name, picture } = <IGgPayload>verify.getPayload();
     if (!email_verified) return res.status(500).json({ error: 'Verificación del email fallida' });
     const password = `${email}your google secrect password`;
@@ -183,18 +180,44 @@ export const googleSignin = async (
     const user = await Users.findOne({ account: email });
 
     if (user) {
-      signinUser(user, password, res);
-    } else {
-      const newUser = {
-        name,
-        account: email,
-        password: passwordHash,
-        avatar: picture,
-        type: 'login',
-      };
-      signupUser(newUser, res);
+      return signinUser(user, password, res);
     }
-    return undefined;
+    const newUser = {
+      name,
+      account: email,
+      password: passwordHash,
+      avatar: picture,
+      type: 'login',
+    };
+    return signupUser(newUser, res);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const facebookSignin = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { accessToken, userID } = req.body;
+
+    const url = apiFacebook.apiFB1 + userID + apiFacebook.apiFB2 + accessToken;
+    const { data } = await api('GET', url);
+    const { email, name, picture } = data;
+
+    const password = `${email}your faceebook secrect password`;
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = await Users.findOne({ account: email });
+
+    if (user) {
+      return signinUser(user, password, res);
+    }
+    const newUser = {
+      name,
+      account: email,
+      password: passwordHash,
+      avatar: picture.data.url,
+      type: 'login',
+    };
+    return signupUser(newUser, res);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
