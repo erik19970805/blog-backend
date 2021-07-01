@@ -15,17 +15,18 @@ export const port = env.PORT ? env.PORT : 4000;
 export const urlClient = env.CLIENT_URL ? env.CLIENT_URL : 'http://localhost:3000';
 
 export const apiGoogle = {
-  clientID: env.MAIL_CLIENT_ID ? env.MAIL_CLIENT_ID : undefined,
-  clientSecret: env.MAIL_CLIENT_SECRET ? env.MAIL_CLIENT_SECRET : undefined,
-  refreshToken: env.MAIL_REFRESH_TOKEN ? env.MAIL_REFRESH_TOKEN : undefined,
-  senderEmailAddress: env.SENDER_EMAIL_ADDRESS ? env.SENDER_EMAIL_ADDRESS : undefined,
-  oauthPlayground: env.OAUTH_PLAYGROUND ? env.OAUTH_PLAYGROUND : undefined,
+  clientID: env.MAIL_CLIENT_ID ? env.MAIL_CLIENT_ID : '',
+  clientSecret: env.MAIL_CLIENT_SECRET ? env.MAIL_CLIENT_SECRET : '',
+  refreshToken: env.MAIL_REFRESH_TOKEN ? env.MAIL_REFRESH_TOKEN : '',
+  senderEmailAddress: env.SENDER_EMAIL_ADDRESS ? env.SENDER_EMAIL_ADDRESS : '',
+  oauthPlayground: env.OAUTH_PLAYGROUND ? env.OAUTH_PLAYGROUND : '',
 };
 
 export const twilio = {
-  accountSid: env.TWILIO_ACCOUNT_SID ? env.TWILIO_ACCOUNT_SID : undefined,
-  authToken: env.TWILIO_AUTH_TOKEN ? env.TWILIO_AUTH_TOKEN : undefined,
-  from: env.TWILIO_PHONE_NUMBER ? env.TWILIO_PHONE_NUMBER : undefined,
+  accountSid: env.TWILIO_ACCOUNT_SID ? env.TWILIO_ACCOUNT_SID : '',
+  authToken: env.TWILIO_AUTH_TOKEN ? env.TWILIO_AUTH_TOKEN : '',
+  from: env.TWILIO_PHONE_NUMBER ? env.TWILIO_PHONE_NUMBER : '',
+  serviceID: env.TWILIO_SERVICE_ID ? env.TWILIO_SERVICE_ID : '',
 };
 
 export const apiFacebook = {

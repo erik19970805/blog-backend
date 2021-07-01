@@ -7,6 +7,8 @@ import {
   signin,
   signout,
   signup,
+  smsSignin,
+  verifySMS,
 } from '../controllers/auth.controller';
 import { validSignup } from '../middlewares/valid';
 
@@ -19,5 +21,7 @@ router.route('/signout').get(signout);
 router.route('/refresh_token').get(refreshToken);
 router.route('/google_signin').post(googleSignin);
 router.route('/facebook_signin').post(facebookSignin);
+router.route('/sms_signin').post(smsSignin);
+router.route('/sms_verify').post(verifySMS);
 
 export default router;

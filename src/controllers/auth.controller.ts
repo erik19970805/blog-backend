@@ -12,7 +12,7 @@ import {
 import { validateEmail, validPhone } from '../middlewares/valid';
 import sendEmail from '../config/sendEmail';
 import { api, apiFacebook, apiGoogle, typeToken, urlClient } from '../config/config';
-import { sendSms } from '../config/sendSMS';
+import { sendSms, smsOTP, smsVerify } from '../config/sendSMS';
 import { IDecodedToken, ITypeToken } from '../interfaces/token.interface';
 import { IGgPayload } from '../interfaces/auth.interface';
 
@@ -220,5 +220,42 @@ export const facebookSignin = async (req: Request, res: Response): Promise<Respo
     return signupUser(newUser, res);
   } catch (error) {
     return res.status(500).json({ error: error.message });
+  }
+};
+
+export const smsSignin = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { phone } = req.body;
+    const data = await smsOTP(phone, 'sms');
+    return res.json(data);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+export const verifySMS = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { phone, code } = req.body;
+
+    const data = await smsVerify(phone, code);
+    if (!data?.valid) return res.status(400).json({ msg: 'Invalid Authentication.' });
+
+    const password = `${phone}your google secrect password`;
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    const user = await Users.findOne({ account: phone });
+
+    if (user) {
+      return signinUser(user, password, res);
+    }
+    const newUser = {
+      name: phone,
+      account: phone,
+      password: passwordHash,
+      type: 'login',
+    };
+    return signupUser(newUser, res);
+  } catch (error) {
+    return res.status(500).json({ msg: error.message });
   }
 };
