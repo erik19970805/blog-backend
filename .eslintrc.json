@@ -12,6 +12,7 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "camelcase": ["off", { "properties": "always" }],
+    "import/prefer-default-export": "off",
     "no-underscore-dangle": "off",
     "func-names": "off",
     "import/extensions": [

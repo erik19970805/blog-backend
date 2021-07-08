@@ -6,6 +6,7 @@ import { port, urlClient } from './config/config';
 
 // Import Routers
 import authRouter from './routes/auth.routes';
+import userRouter from './routes/user.routes';
 
 // Initializations
 const app: Application = express();
@@ -22,5 +23,6 @@ app.use(cookieParser());
 
 // Routers
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 
 export default app;

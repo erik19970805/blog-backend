@@ -1,3 +1,4 @@
+import { Request } from 'express';
 import { Document } from 'mongoose';
 
 export interface IUser {
@@ -11,4 +12,8 @@ export interface IUser {
 
 export interface IUserModel extends Document, IUser {
   matchPassword: (password: string) => Promise<boolean>;
+}
+
+export interface IReqAuth extends Request {
+  user?: IUserModel;
 }
