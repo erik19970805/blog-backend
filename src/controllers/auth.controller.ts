@@ -50,7 +50,13 @@ export const signin = async (req: Request, res: Response): Promise<Response> => 
     const user = await Users.findOne({ account });
     if (!user) return res.status(400).json({ error: 'La cuenta no existe' });
     const isMatch = await user.matchPassword(password);
-    if (!isMatch) return res.status(400).json({ error: 'Constraseña incorrecta' });
+    if (!isMatch) {
+      const error =
+        user.type === 'register'
+          ? 'Constraseña incorrecta'
+          : `Constraseña incorrecta. Esta cuenta esta logeada con ${user.type}`;
+      return res.status(400).json({ error });
+    }
 
     const accessToken = generateAccessToken({ id: user._id });
     const refreshToken = generateRefreshToken({ id: user._id });
@@ -187,7 +193,7 @@ export const googleSignin = async (req: Request, res: Response): Promise<Respons
       account: email,
       password: passwordHash,
       avatar: picture,
-      type: 'login',
+      type: 'google',
     };
     return signupUser(newUser, res);
   } catch (error) {
@@ -215,7 +221,7 @@ export const facebookSignin = async (req: Request, res: Response): Promise<Respo
       account: email,
       password: passwordHash,
       avatar: picture.data.url,
-      type: 'login',
+      type: 'facebook',
     };
     return signupUser(newUser, res);
   } catch (error) {
@@ -252,7 +258,7 @@ export const verifySMS = async (req: Request, res: Response): Promise<Response> 
       name: phone,
       account: phone,
       password: passwordHash,
-      type: 'login',
+      type: 'sms',
     };
     return signupUser(newUser, res);
   } catch (error) {
