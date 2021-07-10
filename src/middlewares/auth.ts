@@ -18,8 +18,19 @@ export const auth = async (
     const user = await Users.findOne({ _id: decoded.id });
     if (!user) return res.status(400).json({ message: 'El usuario no existe' });
     req.user = user;
+    if (!req.user) return res.status(400).json({ message: 'Autenticación Invalida' });
     return next();
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
+};
+
+export const authAdmin = async (
+  req: IReqAuth,
+  res: Response,
+  next: NextFunction,
+): Promise<void | Response> => {
+  if (!req.user) return res.status(400).json({ error: 'Autenticación Invalida' });
+  if (req.user.role !== 'admin') return res.status(400).json({ error: 'Autenticación Invalida' });
+  return next();
 };
