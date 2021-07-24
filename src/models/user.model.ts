@@ -48,4 +48,4 @@ userSchema.methods.toJSON = function (): LeanDocument<IUserModel> {
   return { ...obj, password: '' };
 };
 
-export default model<IUserModel>('User', userSchema);
+export default model<IUserModel>('user', userSchema);

@@ -8,6 +8,7 @@ import { port, urlClient } from './config/config';
 import authRouter from './routes/auth.routes';
 import userRouter from './routes/user.routes';
 import categoryRouter from './routes/category.routes';
+import blogRouter from './routes/blog.routes';
 
 // Initializations
 const app: Application = express();
@@ -26,5 +27,6 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/category', categoryRouter);
+app.use('/api/blog', blogRouter);
 
 export default app;
