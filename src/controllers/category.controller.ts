@@ -34,8 +34,8 @@ export const createCategory = async (req: IReqAuth, res: Response): Promise<Resp
 export const updateCategory = async (req: IReqAuth, res: Response): Promise<Response> => {
   try {
     const name = req.body.name.toLowerCase();
-    const category = await Category.findByIdAndUpdate(req.params.id, { name });
-    return res.json({ category });
+    await Category.findOneAndUpdate({ _id: req.params.id }, { name });
+    return res.json({ message: 'Se actualizo correctamente la categoria' });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
